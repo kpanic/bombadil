@@ -30,6 +30,8 @@ use Mix.Config
 
 config :bombadil, :ecto_repos, [Bombadil.Repo]
 
+config :ecto, json_library: Jason
+
 config :bombadil, Bombadil.Repo,
   database: "bombadil",
   username: "postgres",
