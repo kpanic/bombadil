@@ -26,8 +26,10 @@ mix do ecto.create, ecto.migrate
 # Full string provided
 
 iex> Bombadil.index(data: %{"book" => "Lord of the Rings"})
+# Raw SQL: INSERT INTO "search_index" ("data") VALUES ('{"book": "Lord of the Rings"}')
 :ok
 iex> Bombadil.search("Lord of the Rings")
+# Raw SQL: SELECT s0."id", s0."data" FROM "search_index" AS s0 WHERE (to_tsvector('simple', data::text) @@ plainto_tsquery('simple', 'Lord of the Rings'))
 [
   %Bombadil.Ecto.Schema.SearchIndex{
     __meta__: #Ecto.Schema.Metadata<:loaded, "search_index">,
@@ -39,6 +41,7 @@ iex> Bombadil.search("Lord of the Rings")
 # One word provided (treated as case-insensitive)
 
 iex> Bombadil.search("lord")
+# Raw SQL: SELECT s0."id", s0."data" FROM "search_index" AS s0 WHERE (to_tsvector('simple', data::text) @@ plainto_tsquery('simple', 'lord'))
 [
   %Bombadil.Ecto.Schema.SearchIndex{
     __meta__: #Ecto.Schema.Metadata<:loaded, "search_index">,
@@ -50,6 +53,7 @@ iex> Bombadil.search("lord")
 # No results
 
 iex> Bombadil.search("lordz")
+# Raw SQL: SELECT s0."id", s0."data" FROM "search_index" AS s0 WHERE (to_tsvector('simple', data::text) @@ plainto_tsquery('simple', 'lordz'))
 []
 ```
 
@@ -57,6 +61,7 @@ iex> Bombadil.search("lordz")
 
 ```elixir
 iex> Bombadil.fuzzy_search("lord of the ringz")
+# Raw SQL: SELECT s0."id", s0."data" FROM "search_index" AS s0 WHERE (data::text %> 'lord of the ringz')
 [
   %Bombadil.Ecto.Schema.SearchIndex{
     __meta__: #Ecto.Schema.Metadata<:loaded, "search_index">,
@@ -68,6 +73,7 @@ iex> Bombadil.fuzzy_search("lord of the ringz")
 # No results
 
 iex> Bombadil.fuzzy_search("lard of the ringz asdf")
+# Raw SQL: SELECT s0."id", s0."data" FROM "search_index" AS s0 WHERE (data::text %> 'lord of the ringz asdf')
 []
 ```
 
@@ -79,6 +85,7 @@ iex> Bombadil.fuzzy_search("lard of the ringz asdf")
 iex> Bombadil.index(data: %{"character" => "Tom Bombadil"})
 :ok
 iex> Bombadil.search([%{"book" => "rings"}])
+# Raw SQL: SELECT s0."id", s0."data" FROM "search_index" AS s0 WHERE (FALSE OR to_tsvector('simple', (data->'book')::text) @@ plainto_tsquery('simple', 'rings'))
 [
   %Bombadil.Ecto.Schema.SearchIndex{
     __meta__: #Ecto.Schema.Metadata<:loaded, "search_index">,
@@ -87,6 +94,7 @@ iex> Bombadil.search([%{"book" => "rings"}])
   }
 ]
 iex> Bombadil.search([%{"character" => "bombadil"}])
+# Raw SQL: SELECT s0."id", s0."data" FROM "search_index" AS s0 WHERE (FALSE OR to_tsvector('simple', (data->'character')::text) @@ plainto_tsquery('simple', 'bombadil'))
 [
   %Bombadil.Ecto.Schema.SearchIndex{
     __meta__: #Ecto.Schema.Metadata<:loaded, "search_index">,
@@ -99,6 +107,7 @@ iex> Bombadil.search([%{"character" => "bombadil"}])
 ## Fuzzy match
 ```elixir
 iex> Bombadil.fuzzy_search([%{"book" => "lard"}])
+# Raw SQL: SELECT s0."id", s0."data" FROM "search_index" AS s0 WHERE (FALSE OR (data->'book')::text %> 'lard')
 [
   %Bombadil.Ecto.Schema.SearchIndex{
     __meta__: #Ecto.Schema.Metadata<:loaded, "search_index">,
@@ -107,6 +116,7 @@ iex> Bombadil.fuzzy_search([%{"book" => "lard"}])
   }
 ]
 iex> Bombadil.fuzzy_search([%{"character" => "tom bomba"}])
+# Raw SQL: SELECT s0."id", s0."data" FROM "search_index" AS s0 WHERE (FALSE OR (data->'character')::text %> 'tom bomba')
 [
   %Bombadil.Ecto.Schema.SearchIndex{
     __meta__: #Ecto.Schema.Metadata<:loaded, "search_index">,
@@ -115,6 +125,7 @@ iex> Bombadil.fuzzy_search([%{"character" => "tom bomba"}])
   }
 ]
 iex> Bombadil.fuzzy_search([%{"book" => "tom"}])
+# Raw SQL: SELECT s0."id", s0."data" FROM "search_index" AS s0 WHERE (FALSE OR (data->'book')::text %> 'tom bomba')
 []
 ```
 
