@@ -1,4 +1,6 @@
 sudo: required
+services:
+  - postgresql
 language: elixir
 elixir:
   - 1.9.1
