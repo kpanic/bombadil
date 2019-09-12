@@ -13,7 +13,7 @@ defmodule Bombadil do
   Fuzzy search data
   """
   @spec fuzzy_search(String.t()) :: list()
-  defdelegate fuzzy_search(query), to: Bombadil.Search
+  defdelegate fuzzy_search(query, opts \\ []), to: Bombadil.Search
 
   @doc """
   Index a document

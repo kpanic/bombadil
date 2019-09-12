@@ -129,6 +129,33 @@ iex> Bombadil.fuzzy_search([%{"book" => "tom"}])
 []
 ```
 
+# Matching search results with an additional context
+
+Given a `search_index` that has also an `item_id` field as an additional context
+for filtering, let's suppose you index also the `item_id` and you might have the
+same `item_id` for another entry with different `data` payload like in this snippet:
+
+```elixir
+
+iex> Bombadil.index(item_id: 42, data: %{"ask" => "lord of the rings"})
+iex> Bombadil.index(item_id: 42, data: %{"ask" => "I am hiding with the same id, don't find me!"})
+```
+
+You can apply a search and a context to filter a specific id, in this case `item_id` is `42`
+and the payload that is "hiding" is filtered out.
+
+```elixir
+iex> Bombadil.fuzzy_search("lord of the ringz", context: %{item_id: 42})
+[
+  %Bombadil.Ecto.Schema.SearchIndex{
+    __meta__: #Ecto.Schema.Metadata<:loaded, "search_index">,
+    data: %{"ask" => "lord of the rings"},
+    id: 6,
+    item_id: 42
+  }
+]
+```
+
 # Encoding to JSON
 
 ```elixir

@@ -6,24 +6,26 @@ defmodule Bombadil.Search do
   # EXPLORE websearch
   # SELECT websearch_to_tsquery('english', '"supernovae stars" -crab');
   # TODO: Convert to opts the options ;)
-  def search(search_query, operator \\ :or)
+  def search(search_query, opts \\ [operator: :or])
 
-  def search(search_query, operator) when is_list(search_query) do
+  def search(search_query, opts) when is_list(search_query) do
+    operator = Keyword.get(opts, :operator, :or)
     search_query = to_tuple_list(search_query)
     construct_extact_match_query(search_query, operator)
   end
 
-  def search(search_query, operator) when is_binary(search_query) do
+  def search(search_query, opts) when is_binary(search_query) do
+    operator = Keyword.get(opts, :operator, :or)
     construct_extact_match_query(search_query, operator)
   end
 
-  def fuzzy_search(search_query) when is_list(search_query) do
+  def fuzzy_search(search_query, opts) when is_list(search_query) do
     search_query = to_tuple_list(search_query)
-    construct_fuzzy_query(search_query)
+    construct_fuzzy_query(search_query, opts)
   end
 
-  def fuzzy_search(search_query) when is_binary(search_query) do
-    construct_fuzzy_query(search_query)
+  def fuzzy_search(search_query, opts) when is_binary(search_query) do
+    construct_fuzzy_query(search_query, opts)
   end
 
   defp construct_extact_match_query(search_query, operator) do
@@ -35,10 +37,13 @@ defmodule Bombadil.Search do
     Bombadil.Repo.all(queryable)
   end
 
-  defp construct_fuzzy_query(search_query) do
+  defp construct_fuzzy_query(search_query, opts) do
+    context = Keyword.get(opts, :context, %{})
+
     queryable =
       from(i in SearchIndex,
-        where: ^Bombadil.Criteria.prepare_fuzzy(search_query)
+        where: ^Bombadil.Criteria.prepare_fuzzy(search_query),
+        where: ^Enum.into(context, [])
       )
 
     Bombadil.Repo.all(queryable)

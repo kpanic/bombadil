@@ -107,4 +107,25 @@ defmodule BombadilTest do
              ] = Bombadil.fuzzy_search("fuzy")
     end
   end
+
+  describe "search with a context" do
+    test "and fuzzy search" do
+      assert :ok = Bombadil.index(item_id: 42, data: %{"ask" => "hello fuzzy"})
+
+      assert :ok =
+               Bombadil.index(
+                 item_id: 42,
+                 data: %{"ask" => "I am hiding with the same id, don't find me!"}
+               )
+
+      assert :ok = Bombadil.index(item_id: 24, data: %{"dont_look_at_me" => "hello fuzzy"})
+      assert :ok = Bombadil.index(data: %{"dont_look_at_me" => "hello fuzzy"})
+
+      assert [%_{data: %{"ask" => "hello fuzzy"}, id: _id, test: _test, item_id: 42}] =
+               Bombadil.fuzzy_search([%{"ask" => "hello fuzy"}], context: %{item_id: 42})
+
+      assert [%_{data: %{"ask" => "hello fuzzy"}, id: _id, test: _test, item_id: 42}] =
+               Bombadil.fuzzy_search("hello fuzy", context: %{item_id: 42})
+    end
+  end
 end

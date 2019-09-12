@@ -11,4 +11,4 @@ config :logger, level: :info
 
 config :bombadil,
   table_name: "search_index",
-  additional_fields: [{:test, :string}]
+  additional_fields: [{:test, :string}, {:item_id, :integer}]
