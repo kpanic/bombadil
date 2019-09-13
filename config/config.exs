@@ -33,10 +33,10 @@ config :bombadil, :ecto_repos, [Bombadil.Repo]
 config :ecto, json_library: Jason
 
 config :bombadil, Bombadil.Repo,
-  database: "bombadil",
-  username: "postgres",
-  password: "postgres",
-  hostname: "localhost"
+  database: {:system, "BOMBADIL_DATABASE_NAME", "bombadil"},
+  username: {:system, "BOMBADIL_DATABASE_USERNAME", "postgres"},
+  password: {:system, "BOMBADIL_DATABASE_PASSWORD", "postgres"},
+  hostname: {:system, "BOMBADIL_DATABASE_HOST", "localhost"}
 
 config :bombadil,
   table_name: "search_index",

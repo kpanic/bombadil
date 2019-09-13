@@ -11,6 +11,8 @@ defmodule Bombadil.Application do
       {Bombadil.Repo, []}
     ]
 
+    DeferredConfig.populate(:bombadil)
+
     opts = [strategy: :one_for_one, name: Bombadil.Supervisor]
     Supervisor.start_link(children, opts)
   end
