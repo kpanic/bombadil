@@ -6,6 +6,6 @@ defmodule Bombadil.Repo.Migrations.CreateTrigramExtension do
   end
 
   def down do
-    execute("DROP INDEX users_username_trgm_index;")
+    execute("drop extension pg_trgm;")
   end
 end

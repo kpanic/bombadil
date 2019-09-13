@@ -19,13 +19,14 @@ defmodule Bombadil.Search do
     construct_extact_match_query(search_query, operator)
   end
 
-  def fuzzy_search(search_query, opts) when is_list(search_query) do
+  def fuzzy_search(schema, search_query, opts)
+      when is_list(search_query) and is_atom(schema) and is_list(opts) do
     search_query = to_tuple_list(search_query)
-    construct_fuzzy_query(search_query, opts)
+    construct_fuzzy_query(schema, search_query, opts)
   end
 
-  def fuzzy_search(search_query, opts) when is_binary(search_query) do
-    construct_fuzzy_query(search_query, opts)
+  def fuzzy_search(schema, search_query, opts) when is_binary(search_query) do
+    construct_fuzzy_query(schema, search_query, opts)
   end
 
   defp construct_extact_match_query(search_query, operator) do
@@ -37,11 +38,11 @@ defmodule Bombadil.Search do
     Bombadil.Repo.all(queryable)
   end
 
-  defp construct_fuzzy_query(search_query, opts) do
+  defp construct_fuzzy_query(schema, search_query, opts) do
     context = Keyword.get(opts, :context, %{})
 
     queryable =
-      from(i in SearchIndex,
+      from(i in schema,
         where: ^Bombadil.Criteria.prepare_fuzzy(search_query),
         where: ^Enum.into(context, [])
       )

@@ -24,8 +24,9 @@ mix do ecto.create, ecto.migrate
 
 ```elixir
 # Full string provided
+alias Bombadil.Ecto.Schema.SearchIndex
 
-iex> Bombadil.index(data: %{"book" => "Lord of the Rings"})
+iex> Bombadil.index(SearchIndex, data: %{"book" => "Lord of the Rings"})
 # Raw SQL: INSERT INTO "search_index" ("data") VALUES ('{"book": "Lord of the Rings"}')
 :ok
 iex> Bombadil.search("Lord of the Rings")
@@ -60,7 +61,7 @@ iex> Bombadil.search("lordz")
 ## Fuzzy match
 
 ```elixir
-iex> Bombadil.fuzzy_search("lord of the ringz")
+iex> Bombadil.fuzzy_search(SearchIndex, "lord of the ringz")
 # Raw SQL: SELECT s0."id", s0."data" FROM "search_index" AS s0 WHERE (data::text %> 'lord of the ringz')
 [
   %Bombadil.Ecto.Schema.SearchIndex{
@@ -72,7 +73,7 @@ iex> Bombadil.fuzzy_search("lord of the ringz")
 
 # No results
 
-iex> Bombadil.fuzzy_search("lard of the ringz asdf")
+iex> Bombadil.fuzzy_search(SearchIndex, "lard of the ringz asdf")
 # Raw SQL: SELECT s0."id", s0."data" FROM "search_index" AS s0 WHERE (data::text %> 'lord of the ringz asdf')
 []
 ```
@@ -82,7 +83,7 @@ iex> Bombadil.fuzzy_search("lard of the ringz asdf")
 ## (Almost) Exact match
 
 ```elixir
-iex> Bombadil.index(data: %{"character" => "Tom Bombadil"})
+iex> Bombadil.index(SearchIndex, data: %{"character" => "Tom Bombadil"})
 :ok
 iex> Bombadil.search([%{"book" => "rings"}])
 # Raw SQL: SELECT s0."id", s0."data" FROM "search_index" AS s0 WHERE (FALSE OR to_tsvector('simple', (data->'book')::text) @@ plainto_tsquery('simple', 'rings'))
@@ -106,7 +107,7 @@ iex> Bombadil.search([%{"character" => "bombadil"}])
 
 ## Fuzzy match
 ```elixir
-iex> Bombadil.fuzzy_search([%{"book" => "lard"}])
+iex> Bombadil.fuzzy_search(SearchIndex, [%{"book" => "lard"}])
 # Raw SQL: SELECT s0."id", s0."data" FROM "search_index" AS s0 WHERE (FALSE OR (data->'book')::text %> 'lard')
 [
   %Bombadil.Ecto.Schema.SearchIndex{
@@ -115,7 +116,7 @@ iex> Bombadil.fuzzy_search([%{"book" => "lard"}])
     id: 1
   }
 ]
-iex> Bombadil.fuzzy_search([%{"character" => "tom bomba"}])
+iex> Bombadil.fuzzy_search(SearchIndex, [%{"character" => "tom bomba"}])
 # Raw SQL: SELECT s0."id", s0."data" FROM "search_index" AS s0 WHERE (FALSE OR (data->'character')::text %> 'tom bomba')
 [
   %Bombadil.Ecto.Schema.SearchIndex{
@@ -124,7 +125,7 @@ iex> Bombadil.fuzzy_search([%{"character" => "tom bomba"}])
     id: 3
   }
 ]
-iex> Bombadil.fuzzy_search([%{"book" => "tom"}])
+iex> Bombadil.fuzzy_search(SearchIndex, [%{"book" => "tom"}])
 # Raw SQL: SELECT s0."id", s0."data" FROM "search_index" AS s0 WHERE (FALSE OR (data->'book')::text %> 'tom bomba')
 []
 ```
@@ -137,15 +138,15 @@ same `item_id` for another entry with different `data` payload like in this snip
 
 ```elixir
 
-iex> Bombadil.index(item_id: 42, data: %{"ask" => "lord of the rings"})
-iex> Bombadil.index(item_id: 42, data: %{"ask" => "I am hiding with the same id, don't find me!"})
+iex> Bombadil.index(SearchIndex, item_id: 42, data: %{"ask" => "lord of the rings"})
+iex> Bombadil.index(SearchIndex, item_id: 42, data: %{"ask" => "I am hiding with the same id, don't find me!"})
 ```
 
 You can apply a search and a context to filter a specific id, in this case `item_id` is `42`
 and the payload that is "hiding" is filtered out.
 
 ```elixir
-iex> Bombadil.fuzzy_search("lord of the ringz", context: %{item_id: 42})
+iex> Bombadil.fuzzy_search(SearchIndex, "lord of the ringz", context: %{item_id: 42})
 [
   %Bombadil.Ecto.Schema.SearchIndex{
     __meta__: #Ecto.Schema.Metadata<:loaded, "search_index">,
@@ -254,3 +255,8 @@ mix ecto.migrate
 
 And implement indexing and search for your use case by using the
 `Bombadil.search/1` and `Bombadil.index/2` functions
+
+
+# TODO
+
+ [ ] Port user schema to `Bombadl.search`
