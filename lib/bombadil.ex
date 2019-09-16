@@ -19,5 +19,5 @@ defmodule Bombadil do
   Index a document
   """
   @spec index(Ecto.Schema.t(), map(), list()) :: :ok | {:error, String.t()}
-  defdelegate index(schema, data, params \\ []), to: Bombadil.Index
+  defdelegate index(schema, payload, params \\ []), to: Bombadil.Index
 end

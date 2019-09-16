@@ -1,5 +1,5 @@
 defmodule Bombadil.Ecto.Schema.DynamicSchema do
-  @jsonb_field [{:data, :map}]
+  @jsonb_field [{:payload, :map}]
   @fields Application.get_env(:bombadil, :additional_fields, [])
   @table_name Application.get_env(:bombadil, :table_name, "search_index")
 

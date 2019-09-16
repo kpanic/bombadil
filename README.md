@@ -26,15 +26,15 @@ mix do ecto.create, ecto.migrate
 # Full string provided
 alias Bombadil.Ecto.Schema.SearchIndex
 
-iex> Bombadil.index(SearchIndex, data: %{"book" => "Lord of the Rings"})
-# Raw SQL: INSERT INTO "search_index" ("data") VALUES ('{"book": "Lord of the Rings"}')
+iex> Bombadil.index(SearchIndex, payload: %{"book" => "Lord of the Rings"})
+# Raw SQL: INSERT INTO "search_index" ("payload") VALUES ('{"book": "Lord of the Rings"}')
 :ok
 iex> Bombadil.search("Lord of the Rings")
-# Raw SQL: SELECT s0."id", s0."data" FROM "search_index" AS s0 WHERE (to_tsvector('simple', data::text) @@ plainto_tsquery('simple', 'Lord of the Rings'))
+# Raw SQL: SELECT s0."id", s0."payload" FROM "search_index" AS s0 WHERE (to_tsvector('simple', payload::text) @@ plainto_tsquery('simple', 'Lord of the Rings'))
 [
   %Bombadil.Ecto.Schema.SearchIndex{
     __meta__: #Ecto.Schema.Metadata<:loaded, "search_index">,
-    data: %{"book" => "Lord of the Rings"},
+    payload: %{"book" => "Lord of the Rings"},
     id: 1
   }
 ]
@@ -42,11 +42,11 @@ iex> Bombadil.search("Lord of the Rings")
 # One word provided (treated as case-insensitive)
 
 iex> Bombadil.search("lord")
-# Raw SQL: SELECT s0."id", s0."data" FROM "search_index" AS s0 WHERE (to_tsvector('simple', data::text) @@ plainto_tsquery('simple', 'lord'))
+# Raw SQL: SELECT s0."id", s0."payload" FROM "search_index" AS s0 WHERE (to_tsvector('simple', payload::text) @@ plainto_tsquery('simple', 'lord'))
 [
   %Bombadil.Ecto.Schema.SearchIndex{
     __meta__: #Ecto.Schema.Metadata<:loaded, "search_index">,
-    data: %{"book" => "Lord of the Rings"},
+    payload: %{"book" => "Lord of the Rings"},
     id: 1
   }
 ]
@@ -54,7 +54,7 @@ iex> Bombadil.search("lord")
 # No results
 
 iex> Bombadil.search("lordz")
-# Raw SQL: SELECT s0."id", s0."data" FROM "search_index" AS s0 WHERE (to_tsvector('simple', data::text) @@ plainto_tsquery('simple', 'lordz'))
+# Raw SQL: SELECT s0."id", s0."payload" FROM "search_index" AS s0 WHERE (to_tsvector('simple', payload::text) @@ plainto_tsquery('simple', 'lordz'))
 []
 ```
 
@@ -62,11 +62,11 @@ iex> Bombadil.search("lordz")
 
 ```elixir
 iex> Bombadil.fuzzy_search(SearchIndex, "lord of the ringz")
-# Raw SQL: SELECT s0."id", s0."data" FROM "search_index" AS s0 WHERE (data::text %> 'lord of the ringz')
+# Raw SQL: SELECT s0."id", s0."payload" FROM "search_index" AS s0 WHERE (payload::text %> 'lord of the ringz')
 [
   %Bombadil.Ecto.Schema.SearchIndex{
     __meta__: #Ecto.Schema.Metadata<:loaded, "search_index">,
-    data: %{"book" => "Lord of the Rings"},
+    payload: %{"book" => "Lord of the Rings"},
     id: 1
   }
 ]
@@ -74,7 +74,7 @@ iex> Bombadil.fuzzy_search(SearchIndex, "lord of the ringz")
 # No results
 
 iex> Bombadil.fuzzy_search(SearchIndex, "lard of the ringz asdf")
-# Raw SQL: SELECT s0."id", s0."data" FROM "search_index" AS s0 WHERE (data::text %> 'lord of the ringz asdf')
+# Raw SQL: SELECT s0."id", s0."payload" FROM "search_index" AS s0 WHERE (payload::text %> 'lord of the ringz asdf')
 []
 ```
 
@@ -83,23 +83,23 @@ iex> Bombadil.fuzzy_search(SearchIndex, "lard of the ringz asdf")
 ## (Almost) Exact match
 
 ```elixir
-iex> Bombadil.index(SearchIndex, data: %{"character" => "Tom Bombadil"})
+iex> Bombadil.index(SearchIndex, payload: %{"character" => "Tom Bombadil"})
 :ok
 iex> Bombadil.search([%{"book" => "rings"}])
-# Raw SQL: SELECT s0."id", s0."data" FROM "search_index" AS s0 WHERE (FALSE OR to_tsvector('simple', (data->'book')::text) @@ plainto_tsquery('simple', 'rings'))
+# Raw SQL: SELECT s0."id", s0."payload" FROM "search_index" AS s0 WHERE (FALSE OR to_tsvector('simple', (payload->'book')::text) @@ plainto_tsquery('simple', 'rings'))
 [
   %Bombadil.Ecto.Schema.SearchIndex{
     __meta__: #Ecto.Schema.Metadata<:loaded, "search_index">,
-    data: %{"book" => "Lord of the Rings"},
+    payload: %{"book" => "Lord of the Rings"},
     id: 1
   }
 ]
 iex> Bombadil.search([%{"character" => "bombadil"}])
-# Raw SQL: SELECT s0."id", s0."data" FROM "search_index" AS s0 WHERE (FALSE OR to_tsvector('simple', (data->'character')::text) @@ plainto_tsquery('simple', 'bombadil'))
+# Raw SQL: SELECT s0."id", s0."payload" FROM "search_index" AS s0 WHERE (FALSE OR to_tsvector('simple', (payload->'character')::text) @@ plainto_tsquery('simple', 'bombadil'))
 [
   %Bombadil.Ecto.Schema.SearchIndex{
     __meta__: #Ecto.Schema.Metadata<:loaded, "search_index">,
-    data: %{"character" => "Tom Bombadil"},
+    payload: %{"character" => "Tom Bombadil"},
     id: 3
   }
 ]
@@ -108,25 +108,25 @@ iex> Bombadil.search([%{"character" => "bombadil"}])
 ## Fuzzy match
 ```elixir
 iex> Bombadil.fuzzy_search(SearchIndex, [%{"book" => "lard"}])
-# Raw SQL: SELECT s0."id", s0."data" FROM "search_index" AS s0 WHERE (FALSE OR (data->'book')::text %> 'lard')
+# Raw SQL: SELECT s0."id", s0."payload" FROM "search_index" AS s0 WHERE (FALSE OR (payload->'book')::text %> 'lard')
 [
   %Bombadil.Ecto.Schema.SearchIndex{
     __meta__: #Ecto.Schema.Metadata<:loaded, "search_index">,
-    data: %{"book" => "Lord of the Rings"},
+    payload: %{"book" => "Lord of the Rings"},
     id: 1
   }
 ]
 iex> Bombadil.fuzzy_search(SearchIndex, [%{"character" => "tom bomba"}])
-# Raw SQL: SELECT s0."id", s0."data" FROM "search_index" AS s0 WHERE (FALSE OR (data->'character')::text %> 'tom bomba')
+# Raw SQL: SELECT s0."id", s0."payload" FROM "search_index" AS s0 WHERE (FALSE OR (payload->'character')::text %> 'tom bomba')
 [
   %Bombadil.Ecto.Schema.SearchIndex{
     __meta__: #Ecto.Schema.Metadata<:loaded, "search_index">,
-    data: %{"character" => "Tom Bombadil"},
+    payload: %{"character" => "Tom Bombadil"},
     id: 3
   }
 ]
 iex> Bombadil.fuzzy_search(SearchIndex, [%{"book" => "tom"}])
-# Raw SQL: SELECT s0."id", s0."data" FROM "search_index" AS s0 WHERE (FALSE OR (data->'book')::text %> 'tom bomba')
+# Raw SQL: SELECT s0."id", s0."payload" FROM "search_index" AS s0 WHERE (FALSE OR (payload->'book')::text %> 'tom bomba')
 []
 ```
 
@@ -134,12 +134,12 @@ iex> Bombadil.fuzzy_search(SearchIndex, [%{"book" => "tom"}])
 
 Given a `search_index` that has also an `item_id` field as an additional context
 for filtering, let's suppose you index also the `item_id` and you might have the
-same `item_id` for another entry with different `data` payload like in this snippet:
+same `item_id` for another entry with different `payload` field like in this snippet:
 
 ```elixir
 
-iex> Bombadil.index(SearchIndex, item_id: 42, data: %{"ask" => "lord of the rings"})
-iex> Bombadil.index(SearchIndex, item_id: 42, data: %{"ask" => "I am hiding with the same id, don't find me!"})
+iex> Bombadil.index(SearchIndex, item_id: 42, payload: %{"ask" => "lord of the rings"})
+iex> Bombadil.index(SearchIndex, item_id: 42, payload: %{"ask" => "I am hiding with the same id, don't find me!"})
 ```
 
 You can apply a search and a context to filter a specific id, in this case `item_id` is `42`
@@ -150,7 +150,7 @@ iex> Bombadil.fuzzy_search(SearchIndex, "lord of the ringz", context: %{item_id:
 [
   %Bombadil.Ecto.Schema.SearchIndex{
     __meta__: #Ecto.Schema.Metadata<:loaded, "search_index">,
-    data: %{"ask" => "lord of the rings"},
+    payload: %{"ask" => "lord of the rings"},
     id: 6,
     item_id: 42
   }
@@ -161,7 +161,7 @@ iex> Bombadil.fuzzy_search(SearchIndex, "lord of the ringz", context: %{item_id:
 
 ```elixir
 iex> Bombadil.search("rings") |> Jason.encode!()
-"[{\"data\":{\"book\":\"Lord of the Rings\"}}]"
+"[{\"payload\":{\"book\":\"Lord of the Rings\"}}]"
 ```
 
 # Integration with your application
@@ -178,14 +178,14 @@ defmodule YourApp.Ecto.Schema.SearchIndex do
   @derive {Jason.Encoder, only: @fields}
 
   schema "your_table" do
-    field(:data, :map)
+    field(:payload, :map)
     field(:field1, :string)
     field(:field2, :string)
   end
 end
 ```
 
-**NOTE** that **data field** is mandatory at this stage
+**NOTE** that **payload field** is mandatory at this stage
 
 ### Generate an Ecto migration
 
@@ -202,7 +202,7 @@ defmodule YourApp.Repo.Migrations.CreateSearchIndex do
 
   def change do
       create table("search_index") do
-        add(:data, :jsonb)
+        add(:payload, :jsonb)
         add(:field1, :string)
         add(:field2, :string)
       end

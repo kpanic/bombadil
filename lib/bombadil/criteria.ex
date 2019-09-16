@@ -21,7 +21,7 @@ defmodule Bombadil.Criteria do
   def prepare(query, _operator) when is_binary(query) do
     dynamic(
       fragment(
-        "to_tsvector('simple', data::text) @@ plainto_tsquery('simple', ?)",
+        "to_tsvector('simple', payload::text) @@ plainto_tsquery('simple', ?)",
         ^query
       )
     )
@@ -44,17 +44,17 @@ defmodule Bombadil.Criteria do
   end
 
   def prepare_fuzzy(query, operator) when is_binary(query) and is_atom(operator) do
-    dynamic(fragment("data::text %> ?", ^query))
+    dynamic(fragment("payload::text %> ?", ^query))
   end
 
   def prepare_fuzzy(key, value) when is_binary(key) and is_binary(value) do
-    dynamic(fragment("(data->?)::text %> ?", ^key, ^"#{value}"))
+    dynamic(fragment("(payload->?)::text %> ?", ^key, ^"#{value}"))
   end
 
   def prepare_fragment(key, value) do
     dynamic(
       fragment(
-        "to_tsvector('simple', (data->?)::text) @@ plainto_tsquery('simple', ?)",
+        "to_tsvector('simple', (payload->?)::text) @@ plainto_tsquery('simple', ?)",
         ^key,
         ^"#{value}"
       )
