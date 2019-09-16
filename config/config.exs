@@ -36,7 +36,8 @@ config :bombadil, Bombadil.Repo,
   database: {:system, "BOMBADIL_DATABASE_NAME", "bombadil"},
   username: {:system, "BOMBADIL_DATABASE_USERNAME", "postgres"},
   password: {:system, "BOMBADIL_DATABASE_PASSWORD", "postgres"},
-  hostname: {:system, "BOMBADIL_DATABASE_HOST", "localhost"}
+  hostname: {:system, "BOMBADIL_DATABASE_HOST", "localhost"},
+  otp_app: :bombadil
 
 config :bombadil,
   table_name: "search_index",
