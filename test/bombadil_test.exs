@@ -146,6 +146,15 @@ defmodule BombadilTest do
     end
   end
 
+  defmodule TestSchemaWithCustomColumn do
+    use Ecto.Schema
+
+    schema "search_index" do
+      field(:data, :map, source: :payload)
+      field(:item_id, :integer)
+    end
+  end
+
   describe "user provided schema" do
     test "with fuzzy search" do
       assert :ok = Bombadil.index(TestSchema, item_id: 42, payload: %{"ask" => "hello fuzzy"})
@@ -154,6 +163,19 @@ defmodule BombadilTest do
                Bombadil.fuzzy_search(TestSchema, "hello fuzy", context: %{item_id: 42})
 
       refute :test in Map.keys(result)
+    end
+
+    test "with fuzzy search and custom column" do
+      assert :ok =
+               Bombadil.index(TestSchemaWithCustomColumn,
+                 item_id: 42,
+                 data: %{"ask" => "hello fuzzy"}
+               )
+
+      assert [%_{data: %{"ask" => "hello fuzzy"}, id: _id, item_id: 42} = result] =
+               Bombadil.fuzzy_search(TestSchemaWithCustomColumn, "hello fuzy",
+                 context: %{item_id: 42}
+               )
     end
   end
 end
