@@ -9,7 +9,7 @@ Bombadil is a wrapper around some PostgreSQL search capabilities.
 It supports exact match through PostgreSQL tsvector(s) and fuzzy search inside
 jsonb fields.
 
-**This is a working proof of concept ;) I plan to iterate and improve it. If you have want to contribute you are welcome!**
+**This is a working proof of concept ;) I plan to iterate and improve it. If you want to contribute you are welcome!**
 
 # Preparation
 
@@ -185,7 +185,28 @@ defmodule YourApp.Ecto.Schema.SearchIndex do
 end
 ```
 
-**NOTE** that **payload field** is mandatory at this stage
+### (optional) Define your schema with a different column name
+
+If you want to use a different name for the `payload` field, you can define your schema in this way:
+
+```elixir
+defmodule YourApp.Ecto.Schema.SearchIndex do
+  use Ecto.Schema
+
+  schema "search_index" do
+    field(:data, :map, source: :payload)
+    field(:item_id, :integer)
+  end
+end
+```
+
+Notice how the:
+
+```elixir
+field(:data, :map, source: :payload)
+```
+
+specifies via the `field` macro another name for the `:payload` column
 
 ### Generate an Ecto migration
 
@@ -254,9 +275,9 @@ mix ecto.migrate
 ```
 
 And implement indexing and search for your use case by using the
-`Bombadil.search/1` and `Bombadil.index/2` functions
+`Bombadil.fuzzy_search/2` and `Bombadil.index/2` functions
 
 
 # TODO
 
- [ ] Port user schema to `Bombadl.search`
+ [ ] Port user schema to `Bombadil.search`
