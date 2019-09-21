@@ -6,6 +6,8 @@ defmodule Bombadil.MixProject do
       app: :bombadil,
       version: "0.1.0",
       elixir: "~> 1.8",
+      description: description(),
+      package: package(),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -28,7 +30,32 @@ defmodule Bombadil.MixProject do
       {:postgrex, "~> 0.13"},
       {:jason, "~> 1.0"},
       {:deferred_config, "~> 0.1"},
-      {:dialyxir, "~> 1.0.0-rc.6", only: [:dev], runtime: false}
+      {:dialyxir, "~> 1.0.0-rc.6", only: [:dev], runtime: false},
+      {:ex_doc, ">= 0.0.0", only: :dev}
+    ]
+  end
+
+  defp description() do
+    """
+    Bombadil - You know, for (PostgreSQL) search
+    """
+  end
+
+  defp package() do
+    [
+      files: [
+        "config",
+        "lib",
+        "LICENSE",
+        "mix.exs",
+        "README.md"
+      ],
+      maintainers: ["Marco Milanesi"],
+      licenses: ["Apache 2.0"],
+      links: %{
+        "GitHub" => "https://github.com/kpanic/bombadil",
+        "Issues" => "https://github.com/kpanic/bombadil/issues"
+      }
     ]
   end
 

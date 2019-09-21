@@ -11,6 +11,20 @@ jsonb fields.
 
 **This is a working proof of concept ;) I plan to iterate and improve it. If you want to contribute you are welcome!**
 
+# Installation
+
+The package can be installed by adding carry to your list of dependencies in mix.exs:
+
+```elixir
+def deps do
+  [
+    {:bombadil, "~> 0.1"}
+  ]
+end
+```
+
+Documentation is at https://hexdocs.pm/bombadil
+
 # Preparation
 
 ```elixir
