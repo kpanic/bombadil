@@ -1,7 +1,6 @@
 defmodule BombadilTest do
   use Bombadil.RepoCase
   alias Bombadil.Ecto.Schema.SearchIndex
-  doctest Bombadil
 
   describe "indexing" do
     test "simple payload" do

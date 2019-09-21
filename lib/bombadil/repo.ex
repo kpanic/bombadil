@@ -1,4 +1,6 @@
 defmodule Bombadil.Repo do
+  @moduledoc false
+
   use Ecto.Repo,
     otp_app: :bombadil,
     adapter: Ecto.Adapters.Postgres

@@ -1,4 +1,6 @@
 defmodule Bombadil.Index do
+  @moduledoc false
+
   alias Ecto.Schema
 
   @spec index(Schema.t(), Keyword.t()) :: :ok | {:error, Ecto.Changeset.t()}

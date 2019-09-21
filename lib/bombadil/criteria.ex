@@ -1,4 +1,6 @@
 defmodule Bombadil.Criteria do
+  @moduledoc false
+
   require Ecto.Query.API
   import Ecto.Query, only: [dynamic: 1]
 

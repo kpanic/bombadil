@@ -1,4 +1,6 @@
 defmodule Bombadil.Ecto.DynamicMigration do
+  @moduledoc false
+
   @jsonb_field [{:payload, :jsonb}]
   @fields Application.get_env(:bombadil, :additional_fields, [])
   @table_name Application.get_env(:bombadil, :table_name, "search_index")

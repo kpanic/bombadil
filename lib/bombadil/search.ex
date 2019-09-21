@@ -1,4 +1,6 @@
 defmodule Bombadil.Search do
+  @moduledoc false
+
   import Ecto.Query
 
   alias Bombadil.Ecto.Schema.SearchIndex
