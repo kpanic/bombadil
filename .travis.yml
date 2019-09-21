@@ -3,8 +3,13 @@ services:
   - postgresql
 language: elixir
 elixir:
-  - 1.9.1
+  - 1.8.2
 otp_release:
   - '21.3'
 script:
   - mix test
+  - "travis_wait 30 mix dialyzer --plt"
+  - mix dialyzer --halt-exit-status
+cache:
+  - directories:
+      - .dialyzer
