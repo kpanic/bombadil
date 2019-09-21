@@ -12,12 +12,12 @@ defmodule Bombadil do
   @doc """
   Fuzzy search data
   """
-  @spec fuzzy_search(Ecto.Schema.t(), String.t() | list(), Keyword.t()) :: list()
+  @spec fuzzy_search(Ecto.Schema.t(), String.t() | list(map()), Keyword.t()) :: list()
   defdelegate fuzzy_search(schema, query, opts \\ []), to: Bombadil.Search
 
   @doc """
   Index a document
   """
-  @spec index(Ecto.Schema.t(), map(), list()) :: :ok | {:error, String.t()}
-  defdelegate index(schema, payload, params \\ []), to: Bombadil.Index
+  @spec index(Ecto.Schema.t(), Keyword.t()) :: :ok | {:error, String.t()}
+  defdelegate index(schema, payload), to: Bombadil.Index
 end
