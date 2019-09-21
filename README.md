@@ -13,7 +13,7 @@ jsonb fields.
 
 # Installation
 
-The package can be installed by adding carry to your list of dependencies in mix.exs:
+The package can be installed by adding bombadil to your list of dependencies in mix.exs:
 
 ```elixir
 def deps do
