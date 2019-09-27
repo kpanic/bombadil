@@ -9,8 +9,6 @@ Bombadil is a wrapper around some PostgreSQL search capabilities.
 It supports exact match through PostgreSQL tsvector(s) and fuzzy search inside
 jsonb fields.
 
-**This is a working proof of concept ;) I plan to iterate and improve it. If you want to contribute you are welcome!**
-
 # Installation
 
 The package can be installed by adding bombadil to your list of dependencies in mix.exs:
@@ -294,4 +292,13 @@ And implement indexing and search for your use case by using the
 
 # TODO
 
- [ ] Port user schema to `Bombadil.search`
+[ ] Port user schema to `Bombadil.search`
+
+[ ] Support other fields, rather than jsonb (?)
+
+## Thank you(s)
+Many thanks to [Taxfix](https://taxfix.de) for giving me the possibility to
+develop and release this library.🚀
+
+Thanks to the https://github.com/textacular/textacular ruby library for having
+kicked my butt to create something similar for Elixir ☯
