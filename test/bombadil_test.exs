@@ -164,6 +164,16 @@ defmodule BombadilTest do
       refute :test in Map.keys(result)
     end
 
+    test "updating a record in the index" do
+      assert :ok = Bombadil.index(TestSchema, item_id: 42, payload: %{"ask" => "hello fuzzy"})
+
+      record = Bombadil.Repo.get_by!(TestSchema, item_id: 42)
+      assert :ok = Bombadil.index(TestSchema, record, payload: %{"ask" => "me anything"})
+
+      assert %{payload: %{"ask" => "me anything"}, item_id: 42} =
+               Bombadil.Repo.get_by!(TestSchema, item_id: 42)
+    end
+
     test "with fuzzy search and custom column" do
       assert :ok =
                Bombadil.index(TestSchemaWithCustomColumn,
