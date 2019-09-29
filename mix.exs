@@ -4,7 +4,7 @@ defmodule Bombadil.MixProject do
   def project do
     [
       app: :bombadil,
-      version: "0.1.2",
+      version: "0.2.0",
       elixir: "~> 1.8",
       description: description(),
       package: package(),
