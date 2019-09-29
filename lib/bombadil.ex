@@ -17,7 +17,7 @@ defmodule Bombadil do
 
       alias Bombadil.Ecto.Schema.SearchIndex
 
-      iex> Bombadil.search("Lord of the Rings")
+      iex> YourEctoRepo.all(Bombadil.search("Lord of the Rings"))
       [
         %Bombadil.Ecto.Schema.SearchIndex{
           __meta__: #Ecto.Schema.Metadata<:loaded, "search_index">,
@@ -38,7 +38,7 @@ defmodule Bombadil do
 
       alias Bombadil.Ecto.Schema.SearchIndex
 
-      iex> Bombadil.fuzzy_search(SearchIndex, "lord of the ringz")
+      iex> YourEctoRepo.all(Bombadil.fuzzy_search(SearchIndex, "lord of the ringz"))
       [
         %Bombadil.Ecto.Schema.SearchIndex{
           __meta__: #Ecto.Schema.Metadata<:loaded, "search_index">,
@@ -56,7 +56,8 @@ defmodule Bombadil do
   ## Example:
 
       alias Bombadil.Ecto.Schema.SearchIndex
-      Bombadil.index(SearchIndex, payload: %{"book" => "Lord of the Rings"})
+
+      YourEctoRepo.insert_or_update(Bombadil.index(SearchIndex, payload: %{"book" => "Lord of the Rings"}))
   """
   @spec index(Ecto.Schema.t(), Keyword.t() | Ecto.Changeset.t(), Keyword.t()) :: Ecto.Changeset.t()
   defdelegate index(schema, payload, params \\ []), to: Bombadil.Index
