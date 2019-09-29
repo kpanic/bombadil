@@ -28,7 +28,6 @@ defmodule Bombadil.MixProject do
       {:ecto, "~> 2.2"},
       {:postgrex, "~> 0.13"},
       {:jason, "~> 1.0"},
-      {:deferred_config, "~> 0.1"},
       {:dialyxir, "~> 1.0.0-rc.6", only: [:dev], runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev}
     ]
