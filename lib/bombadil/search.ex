@@ -32,24 +32,18 @@ defmodule Bombadil.Search do
   end
 
   defp construct_extact_match_query(search_query, operator) do
-    queryable =
-      from(i in SearchIndex,
-        where: ^Bombadil.Criteria.prepare(search_query, operator)
-      )
-
-    Bombadil.Repo.all(queryable)
+    from(i in SearchIndex,
+      where: ^Bombadil.Criteria.prepare(search_query, operator)
+    )
   end
 
   defp construct_fuzzy_query(schema, search_query, opts) do
     context = Keyword.get(opts, :context, %{})
 
-    queryable =
-      from(i in schema,
-        where: ^Bombadil.Criteria.prepare_fuzzy(search_query),
-        where: ^Enum.into(context, [])
-      )
-
-    Bombadil.Repo.all(queryable)
+    from(i in schema,
+      where: ^Bombadil.Criteria.prepare_fuzzy(search_query),
+      where: ^Enum.into(context, [])
+    )
   end
 
   defp to_tuple_list(search_query) do

@@ -3,21 +3,19 @@ defmodule Bombadil.RepoCase do
 
   using do
     quote do
-      alias Bombadil.Repo
+      alias Bombadil.TestRepo
 
       import Ecto
       import Ecto.Query
       import Bombadil.RepoCase
-
-      # and any other stuff
     end
   end
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Bombadil.Repo)
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Bombadil.TestRepo)
 
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(Bombadil.Repo, {:shared, self()})
+      Ecto.Adapters.SQL.Sandbox.mode(Bombadil.TestRepo, {:shared, self()})
     end
 
     :ok

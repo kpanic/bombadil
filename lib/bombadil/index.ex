@@ -1,16 +1,8 @@
 defmodule Bombadil.Index do
   @moduledoc false
 
-  alias Ecto.Schema
-
-  @spec index(Schema.t(), Keyword.t() | Ecto.Changeset.t(), Keyword.t()) ::
-          :ok | {:error, Ecto.Changeset.t()}
   def index(schema, payload, params) do
-    changeset = prepare_changeset(schema, payload, params)
-
-    with {:ok, _} = Bombadil.Repo.insert_or_update(changeset) do
-      :ok
-    end
+    prepare_changeset(schema, payload, params)
   end
 
   defp prepare_changeset(schema, payload, params) when params == [] do

@@ -26,7 +26,7 @@ defmodule Bombadil do
         }
       ]
   """
-  @spec search(String.t() | list()) :: list()
+  @spec search(String.t()) :: Ecto.Query.t()
   defdelegate search(query), to: Bombadil.Search
 
   @doc """
@@ -47,7 +47,7 @@ defmodule Bombadil do
         }
       ]
   """
-  @spec fuzzy_search(Ecto.Schema.t(), String.t() | list(), Keyword.t()) :: list()
+  @spec fuzzy_search(Ecto.Schema.t(), String.t() | list(), Keyword.t()) :: Ecto.Query.t()
   defdelegate fuzzy_search(schema, query, opts \\ []), to: Bombadil.Search
 
   @doc """
@@ -58,6 +58,6 @@ defmodule Bombadil do
       alias Bombadil.Ecto.Schema.SearchIndex
       Bombadil.index(SearchIndex, payload: %{"book" => "Lord of the Rings"})
   """
-  @spec index(Ecto.Schema.t(), map(), list()) :: :ok | {:error, String.t()}
+  @spec index(Ecto.Schema.t(), Keyword.t() | Ecto.Changeset.t(), Keyword.t()) :: Ecto.Changeset.t()
   defdelegate index(schema, payload, params \\ []), to: Bombadil.Index
 end

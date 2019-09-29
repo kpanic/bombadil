@@ -28,16 +28,7 @@ use Mix.Config
 # here (which is why it is important to import them last).
 #
 
-config :bombadil, :ecto_repos, [Bombadil.Repo]
-
 config :ecto, json_library: Jason
-
-config :bombadil, Bombadil.Repo,
-  database: {:system, "BOMBADIL_DATABASE_NAME", "bombadil"},
-  username: {:system, "BOMBADIL_DATABASE_USERNAME", "postgres"},
-  password: {:system, "BOMBADIL_DATABASE_PASSWORD", "postgres"},
-  hostname: {:system, "BOMBADIL_DATABASE_HOST", "localhost"},
-  otp_app: :bombadil
 
 config :bombadil,
   table_name: "search_index",
