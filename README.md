@@ -16,7 +16,7 @@ The package can be installed by adding bombadil to your list of dependencies in 
 ```elixir
 def deps do
   [
-    {:bombadil, "~> 0.1"}
+    {:bombadil, "~> 0.2"}
   ]
 end
 ```
