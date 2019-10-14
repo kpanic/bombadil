@@ -17,7 +17,7 @@ defmodule Bombadil do
 
       alias Bombadil.Ecto.Schema.SearchIndex
 
-      iex> YourEctoRepo.all(Bombadil.search("Lord of the Rings"))
+      iex> YourEctoRepo.all(Bombadil.search(SearchIndex, "Lord of the Rings"))
       [
         %Bombadil.Ecto.Schema.SearchIndex{
           __meta__: #Ecto.Schema.Metadata<:loaded, "search_index">,
@@ -26,8 +26,8 @@ defmodule Bombadil do
         }
       ]
   """
-  @spec search(String.t()) :: Ecto.Query.t()
-  defdelegate search(query), to: Bombadil.Search
+  @spec search(Ecto.Schema.t(), String.t()) :: Ecto.Query.t()
+  defdelegate search(schema, query, opts \\ []), to: Bombadil.Search
 
   @doc """
   Fuzzy search data of a string (or substring)
@@ -59,6 +59,7 @@ defmodule Bombadil do
 
       YourEctoRepo.insert_or_update(Bombadil.index(SearchIndex, payload: %{"book" => "Lord of the Rings"}))
   """
-  @spec index(Ecto.Schema.t(), Keyword.t() | Ecto.Changeset.t(), Keyword.t()) :: Ecto.Changeset.t()
+  @spec index(Ecto.Schema.t(), Keyword.t() | Ecto.Changeset.t(), Keyword.t()) ::
+          Ecto.Changeset.t()
   defdelegate index(schema, payload, params \\ []), to: Bombadil.Index
 end

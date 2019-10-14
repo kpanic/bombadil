@@ -39,7 +39,7 @@ iex> YourRepo.insert_or_update(Bombadil.index(SearchIndex, payload: %{"book" => 
 {:ok, struct}
 
 # Full string provided
-iex> YourRepo.all(Bombadil.search("Lord of the Rings"))
+iex> YourRepo.all(Bombadil.search(SearchIndex, "Lord of the Rings"))
 # Raw SQL: SELECT s0."id", s0."payload" FROM "search_index" AS s0 WHERE (to_tsvector('simple', payload::text) @@ plainto_tsquery('simple', 'Lord of the Rings'))
 [
   %Bombadil.Ecto.Schema.SearchIndex{
@@ -51,7 +51,7 @@ iex> YourRepo.all(Bombadil.search("Lord of the Rings"))
 
 # One word provided (treated as case-insensitive)
 
-iex> YourRepo.all(Bombadil.search("lord"))
+iex> YourRepo.all(Bombadil.search(SearchIndex, "lord"))
 # Raw SQL: SELECT s0."id", s0."payload" FROM "search_index" AS s0 WHERE (to_tsvector('simple', payload::text) @@ plainto_tsquery('simple', 'lord'))
 [
   %Bombadil.Ecto.Schema.SearchIndex{
@@ -63,7 +63,7 @@ iex> YourRepo.all(Bombadil.search("lord"))
 
 # No results
 
-iex> YourRepo.all(Bombadil.search("lordz"))
+iex> YourRepo.all(Bombadil.search(SearchIndex, "lordz"))
 # Raw SQL: SELECT s0."id", s0."payload" FROM "search_index" AS s0 WHERE (to_tsvector('simple', payload::text) @@ plainto_tsquery('simple', 'lordz'))
 []
 ```
@@ -95,7 +95,7 @@ iex> YourRepo.all(Bombadil.fuzzy_search(SearchIndex, "lard of the ringz asdf"))
 ```elixir
 iex> YourRepo.insert_or_update(Bombadil.index(SearchIndex, payload: %{"character" => "Tom Bombadil"}))
 {:ok, struct}
-iex> YourRepo.all(Bombadil.search([%{"book" => "rings"}]))
+iex> YourRepo.all(Bombadil.search(SearchIndex, [%{"book" => "rings"}]))
 # Raw SQL: SELECT s0."id", s0."payload" FROM "search_index" AS s0 WHERE (FALSE OR to_tsvector('simple', (payload->'book')::text) @@ plainto_tsquery('simple', 'rings'))
 [
   %Bombadil.Ecto.Schema.SearchIndex{
@@ -104,7 +104,7 @@ iex> YourRepo.all(Bombadil.search([%{"book" => "rings"}]))
     id: 1
   }
 ]
-iex> YourRepo.all(Bombadil.search([%{"character" => "bombadil"}]))
+iex> YourRepo.all(Bombadil.search(SearchIndex, [%{"character" => "bombadil"}]))
 # Raw SQL: SELECT s0."id", s0."payload" FROM "search_index" AS s0 WHERE (FALSE OR to_tsvector('simple', (payload->'character')::text) @@ plainto_tsquery('simple', 'bombadil'))
 [
   %Bombadil.Ecto.Schema.SearchIndex{
@@ -170,7 +170,7 @@ iex> YourRepo.all(Bombadil.fuzzy_search(SearchIndex, "lord of the ringz", contex
 # Encoding to JSON
 
 ```elixir
-iex> Bombadil.search("rings") |> Jason.encode!()
+iex> Bombadil.search(SearchIndex, "rings") |> Jason.encode!()
 "[{\"payload\":{\"book\":\"Lord of the Rings\"}}]"
 ```
 
@@ -289,8 +289,6 @@ And implement indexing and search for your use case by using the
 
 
 # TODO
-
-[ ] Port user schema to `Bombadil.search`
 
 [ ] Support other fields, rather than jsonb (?)
 
