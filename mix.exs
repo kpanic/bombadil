@@ -25,8 +25,9 @@ defmodule Bombadil.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:ecto, "~> 2.2"},
-      {:postgrex, "~> 0.13"},
+      {:ecto, "~> 3.0"},
+      {:ecto_sql, "~> 3.0", only: [:test]},
+      {:postgrex, ">= 0.0.0", only: [:test]},
       {:jason, "~> 1.0"},
       {:dialyxir, "~> 1.0.0-rc.6", only: [:dev], runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev}
