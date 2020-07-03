@@ -29,7 +29,7 @@ defmodule Bombadil.MixProject do
       {:ecto_sql, "~> 3.0", only: [:test]},
       {:postgrex, ">= 0.0.0", only: [:test]},
       {:jason, "~> 1.0"},
-      {:dialyxir, "~> 1.0.0-rc.6", only: [:dev], runtime: false},
+      {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev}
     ]
   end
