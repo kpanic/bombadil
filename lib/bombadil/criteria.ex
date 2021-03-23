@@ -53,6 +53,14 @@ defmodule Bombadil.Criteria do
     dynamic(fragment("(payload->?)::text %> ?", ^key, ^"#{value}"))
   end
 
+  def order_by(search_query) when is_list(search_query) do
+    Enum.flat_map(search_query, fn {key, value} ->
+      [asc: dynamic(fragment("(payload->?)::text <-> ?", ^key, ^value))]
+    end)
+  end
+
+  def order_by(search_query) when is_binary(search_query), do: []
+
   def prepare_fragment(key, value) do
     dynamic(
       fragment(

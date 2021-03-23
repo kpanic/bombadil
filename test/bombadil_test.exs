@@ -124,6 +124,59 @@ defmodule BombadilTest do
                TestRepo.all(Bombadil.fuzzy_search(SearchIndex, "fuzy"))
     end
 
+    test "simple speling error with sorted multiple matches" do
+      assert {:ok, _} =
+               TestRepo.insert_or_update(
+                 Bombadil.index(SearchIndex,
+                   payload: %{
+                     "ask" => "fuzzy",
+                     "test" => "foozy",
+                     "metadata" => [%{"meta" => "data"}]
+                   }
+                 )
+               )
+
+      assert {:ok, _} =
+               TestRepo.insert_or_update(
+                 Bombadil.index(SearchIndex,
+                   payload: %{
+                     "ask" => "hello fuzzy2",
+                     "test" => "foozy3",
+                     "metadata" => [%{"meta" => "data"}]
+                   }
+                 )
+               )
+
+      assert [
+               %{payload: %{"ask" => "fuzzy", "metadata" => [%{"meta" => "data"}]}},
+               %{payload: %{"ask" => "hello fuzzy2", "metadata" => [%{"meta" => "data"}]}}
+             ] = TestRepo.all(Bombadil.fuzzy_search(SearchIndex, "fuzy"))
+
+      assert [
+               %{payload: %{"ask" => "hello fuzzy2", "metadata" => [%{"meta" => "data"}]}}
+             ] = TestRepo.all(Bombadil.fuzzy_search(SearchIndex, "hel"))
+
+      assert {:ok, _} =
+               TestRepo.insert_or_update(
+                 Bombadil.index(SearchIndex,
+                   payload: %{
+                     "ask" => "hello fuzzy3",
+                     "test" => "foozy2",
+                     "metadata" => [%{"meta" => "data"}]
+                   }
+                 )
+               )
+
+      assert [
+               %_{payload: %{"ask" => "fuzzy", "test" => "foozy"}, id: _, test: _},
+               %_{payload: %{"ask" => "hello fuzzy2", "test" => "foozy3"}, id: _, test: _},
+               %_{payload: %{"ask" => "hello fuzzy3", "test" => "foozy2"}, id: _, test: _}
+             ] =
+               TestRepo.all(
+                 Bombadil.fuzzy_search(SearchIndex, [%{"ask" => "fluffy", "test" => "foozy"}])
+               )
+    end
+
     test "speling error match with nested payload" do
       assert {:ok, _} =
                TestRepo.insert_or_update(
@@ -171,6 +224,14 @@ defmodule BombadilTest do
                  )
                )
 
+      assert {:ok, _} =
+               TestRepo.insert_or_update(
+                 Bombadil.index(SearchIndex,
+                   item_id: 55,
+                   payload: %{"ask" => "hello exact match 2"}
+                 )
+               )
+
       assert [
                %Bombadil.Ecto.Schema.SearchIndex{
                  id: _id,
@@ -196,6 +257,21 @@ defmodule BombadilTest do
                TestRepo.all(
                  Bombadil.search(SearchIndex, "hello exact match", context: %{item_id: 42})
                )
+
+      assert [
+               %Bombadil.Ecto.Schema.SearchIndex{
+                 id: _,
+                 item_id: 42,
+                 payload: %{"ask" => "hello exact match"},
+                 test: nil
+               },
+               %Bombadil.Ecto.Schema.SearchIndex{
+                 id: _,
+                 item_id: 55,
+                 payload: %{"ask" => "hello exact match 2"},
+                 test: nil
+               }
+             ] = TestRepo.all(Bombadil.search(SearchIndex, [%{"ask" => "hello exact match"}]))
     end
 
     test "and fuzzy search" do
@@ -298,7 +374,7 @@ defmodule BombadilTest do
                  )
                )
 
-      assert [%_{data: %{"ask" => "hello fuzzy"}, id: _id, item_id: 42} = result] =
+      assert [%_{data: %{"ask" => "hello fuzzy"}, id: _id, item_id: 42}] =
                TestRepo.all(
                  Bombadil.fuzzy_search(TestSchemaWithCustomColumn, "hello fuzy",
                    context: %{item_id: 42}

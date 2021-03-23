@@ -28,8 +28,6 @@ use Mix.Config
 # here (which is why it is important to import them last).
 #
 
-config :ecto, json_library: Jason
-
 config :bombadil,
   table_name: "search_index",
   additional_fields: []

@@ -10,11 +10,11 @@ defmodule Bombadil.Search do
 
   def search(schema, search_query, opts) when is_list(search_query) do
     search_query = to_tuple_list(search_query)
-    construct_extact_match_query(schema, search_query, opts)
+    construct_exact_match_query(schema, search_query, opts)
   end
 
   def search(schema, search_query, opts) when is_binary(search_query) do
-    construct_extact_match_query(schema, search_query, opts)
+    construct_exact_match_query(schema, search_query, opts)
   end
 
   def fuzzy_search(schema, search_query, opts)
@@ -27,21 +27,37 @@ defmodule Bombadil.Search do
     construct_fuzzy_query(schema, search_query, opts)
   end
 
-  defp construct_extact_match_query(schema, search_query, opts) do
+  defp construct_exact_match_query(schema, search_query, opts) do
+    context = Keyword.get(opts, :context, %{})
+
+    order_by = Bombadil.Criteria.order_by(search_query)
+
+    from(i in schema,
+      where: ^Enum.into(context, []),
+      where: ^Bombadil.Criteria.prepare(search_query),
+      order_by: ^order_by
+    )
+  end
+
+  defp construct_fuzzy_query(schema, search_query, opts) when is_binary(search_query) do
     context = Keyword.get(opts, :context, %{})
 
     from(i in schema,
-      where: ^Bombadil.Criteria.prepare(search_query),
-      where: ^Enum.into(context, [])
+      where: ^Enum.into(context, []),
+      where: ^Bombadil.Criteria.prepare_fuzzy(search_query),
+      order_by: [asc: i.payload]
     )
   end
 
   defp construct_fuzzy_query(schema, search_query, opts) do
     context = Keyword.get(opts, :context, %{})
 
+    order_by = Bombadil.Criteria.order_by(search_query)
+
     from(i in schema,
+      where: ^Enum.into(context, []),
       where: ^Bombadil.Criteria.prepare_fuzzy(search_query),
-      where: ^Enum.into(context, [])
+      order_by: ^order_by
     )
   end
 
