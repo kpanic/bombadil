@@ -23,8 +23,8 @@ defmodule Bombadil.Criteria do
   def prepare(query, _operator) when is_binary(query) do
     dynamic(
       fragment(
-        "to_tsvector('simple', payload::text) @@ plainto_tsquery('simple', ?)",
-        ^query
+        "(payload::text) ~~* ?",
+        ^"%#{query}%"
       )
     )
   end
@@ -64,9 +64,9 @@ defmodule Bombadil.Criteria do
   def prepare_fragment(key, value) do
     dynamic(
       fragment(
-        "to_tsvector('simple', (payload->?)::text) @@ plainto_tsquery('simple', ?)",
+        "(payload->?)::text ~~* ?",
         ^key,
-        ^"#{value}"
+        ^"%#{value}%"
       )
     )
   end
