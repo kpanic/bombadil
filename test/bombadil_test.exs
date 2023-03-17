@@ -55,6 +55,18 @@ defmodule BombadilTest do
 
       assert [] = TestRepo.all(Bombadil.search(SearchIndex, [%{"ask" => "ciao"}]))
     end
+
+    test "index payload with composite words and map" do
+      assert {:ok, _} =
+               TestRepo.insert_or_update(
+                 Bombadil.index(SearchIndex,
+                   payload: %{"ask" => "?ciao._nested_and_other_things"}
+                 )
+               )
+
+      assert [%_{payload: %{"ask" => "?ciao._nested_and_other_things"}}] =
+               TestRepo.all(Bombadil.search(SearchIndex, [%{"ask" => "_nested"}]))
+    end
   end
 
   describe "full text search" do
@@ -81,6 +93,18 @@ defmodule BombadilTest do
 
       assert [%_{payload: %{"ask" => "hello world", "metadata" => [%{"meta" => "data"}]}}] =
                TestRepo.all(Bombadil.search(SearchIndex, "hello world"))
+    end
+
+    test "index payload with composite words" do
+      assert {:ok, _} =
+               TestRepo.insert_or_update(
+                 Bombadil.index(SearchIndex,
+                   payload: %{"ask" => "?ciao._nested_and_other_things"}
+                 )
+               )
+
+      assert [%_{payload: %{"ask" => "?ciao._nested_and_other_things"}}] =
+               TestRepo.all(Bombadil.search(SearchIndex, "_nested"))
     end
   end
 
