@@ -40,7 +40,7 @@ iex> YourRepo.insert_or_update(Bombadil.index(SearchIndex, payload: %{"book" => 
 
 # Full string provided
 iex> YourRepo.all(Bombadil.search(SearchIndex, "Lord of the Rings"))
-# Raw SQL: SELECT s0."id", s0."payload" FROM "search_index" AS s0 WHERE (to_tsvector('simple', payload::text) @@ plainto_tsquery('simple', 'Lord of the Rings'))
+# Raw SQL: SELECT s0."id", s0."test", s0."item_id", s0."payload" FROM "search_index" AS s0 WHERE ((payload::text) ~~* $1) ["%Lord of the Rings%"]
 [
   %Bombadil.Ecto.Schema.SearchIndex{
     __meta__: #Ecto.Schema.Metadata<:loaded, "search_index">,
@@ -52,7 +52,7 @@ iex> YourRepo.all(Bombadil.search(SearchIndex, "Lord of the Rings"))
 # One word provided (treated as case-insensitive)
 
 iex> YourRepo.all(Bombadil.search(SearchIndex, "lord"))
-# Raw SQL: SELECT s0."id", s0."payload" FROM "search_index" AS s0 WHERE (to_tsvector('simple', payload::text) @@ plainto_tsquery('simple', 'lord'))
+# Raw SQL: SELECT s0."id", s0."test", s0."item_id", s0."payload" FROM "search_index" AS s0 WHERE ((payload::text) ~~* $1) ["%lord%"]
 [
   %Bombadil.Ecto.Schema.SearchIndex{
     __meta__: #Ecto.Schema.Metadata<:loaded, "search_index">,
@@ -64,8 +64,7 @@ iex> YourRepo.all(Bombadil.search(SearchIndex, "lord"))
 # No results
 
 iex> YourRepo.all(Bombadil.search(SearchIndex, "lordz"))
-# Raw SQL: SELECT s0."id", s0."payload" FROM "search_index" AS s0 WHERE (to_tsvector('simple', payload::text) @@ plainto_tsquery('simple', 'lordz'))
-[]
+# Raw SQL: SELECT s0."id", s0."test", s0."item_id", s0."payload" FROM "search_index" AS s0 WHERE ((payload::text) ~~* $1) ["%lordz%"][]
 ```
 
 ## Fuzzy match
@@ -96,7 +95,7 @@ iex> YourRepo.all(Bombadil.fuzzy_search(SearchIndex, "lard of the ringz asdf"))
 iex> YourRepo.insert_or_update(Bombadil.index(SearchIndex, payload: %{"character" => "Tom Bombadil"}))
 {:ok, struct}
 iex> YourRepo.all(Bombadil.search(SearchIndex, [%{"book" => "rings"}]))
-# Raw SQL: SELECT s0."id", s0."payload" FROM "search_index" AS s0 WHERE (FALSE OR to_tsvector('simple', (payload->'book')::text) @@ plainto_tsquery('simple', 'rings'))
+# Raw SQL: SELECT s0."id", s0."test", s0."item_id", s0."payload" FROM "search_index" AS s0 WHERE (FALSE OR (payload->$1)::text ~~* $2)
 [
   %Bombadil.Ecto.Schema.SearchIndex{
     __meta__: #Ecto.Schema.Metadata<:loaded, "search_index">,
@@ -105,8 +104,7 @@ iex> YourRepo.all(Bombadil.search(SearchIndex, [%{"book" => "rings"}]))
   }
 ]
 iex> YourRepo.all(Bombadil.search(SearchIndex, [%{"character" => "bombadil"}]))
-# Raw SQL: SELECT s0."id", s0."payload" FROM "search_index" AS s0 WHERE (FALSE OR to_tsvector('simple', (payload->'character')::text) @@ plainto_tsquery('simple', 'bombadil'))
-[
+# Raw SQL: SELECT s0."id", s0."test", s0."item_id", s0."payload" FROM "search_index" AS s0 WHERE (FALSE OR (payload->$1)::text ~~* $2)[
   %Bombadil.Ecto.Schema.SearchIndex{
     __meta__: #Ecto.Schema.Metadata<:loaded, "search_index">,
     payload: %{"character" => "Tom Bombadil"},
