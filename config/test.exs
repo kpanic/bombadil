@@ -1,4 +1,4 @@
-use Mix.Config
+import Config
 
 config :bombadil, Bombadil.TestRepo,
   username: "postgres",

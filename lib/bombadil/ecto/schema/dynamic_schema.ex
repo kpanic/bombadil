@@ -2,8 +2,8 @@ defmodule Bombadil.Ecto.Schema.DynamicSchema do
   @moduledoc false
 
   @jsonb_field [{:payload, :map}]
-  @fields Application.get_env(:bombadil, :additional_fields, [])
-  @table_name Application.get_env(:bombadil, :table_name, "search_index")
+  @fields Application.compile_env(:bombadil, :additional_fields, [])
+  @table_name Application.compile_env(:bombadil, :table_name, "search_index")
 
   defmacro __using__(_) do
     quote do
