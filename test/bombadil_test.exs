@@ -225,6 +225,49 @@ defmodule BombadilTest do
     end
   end
 
+  describe "fuzzy search - additional cases" do
+    setup do
+      # Index a variety of data for more realistic fuzzy search
+      TestRepo.insert_or_update(Bombadil.index(SearchIndex, payload: %{"title" => "The Lord of the Rings", "author" => "J.R.R. Tolkien"}))
+      TestRepo.insert_or_update(Bombadil.index(SearchIndex, payload: %{"title" => "The Hobbit", "author" => "J.R.R. Tolkien"}))
+      TestRepo.insert_or_update(Bombadil.index(SearchIndex, payload: %{"title" => "Silmarillion", "author" => "J.R.R. Tolkien"}))
+      TestRepo.insert_or_update(Bombadil.index(SearchIndex, payload: %{"title" => "A Game of Thrones", "author" => "George R. R. Martin"}))
+      TestRepo.insert_or_update(Bombadil.index(SearchIndex, payload: %{"title" => "A Clash of Kings", "author" => "George R. R. Martin"}))
+      :ok
+    end
+
+    test "fuzzy match with typo in title" do
+      results = TestRepo.all(Bombadil.fuzzy_search(SearchIndex, "Lrod of the Rigns"))
+      assert Enum.any?(results, fn r -> r.payload["title"] == "The Lord of the Rings" end)
+    end
+
+    test "fuzzy match with partial word" do
+      results = TestRepo.all(Bombadil.fuzzy_search(SearchIndex, "Silmaril"))
+      assert Enum.any?(results, fn r -> r.payload["title"] == "Silmarillion" end)
+    end
+
+    test "fuzzy match with author typo" do
+      results = TestRepo.all(Bombadil.fuzzy_search(SearchIndex, [%{"author" => "Tolkine"}]))
+      assert Enum.any?(results, fn r -> r.payload["author"] == "J.R.R. Tolkien" end)
+    end
+
+    test "fuzzy match should not match unrelated data" do
+      results = TestRepo.all(Bombadil.fuzzy_search(SearchIndex, "Harry Potter"))
+      assert results == []
+    end
+
+    test "fuzzy match with special characters" do
+      TestRepo.insert_or_update(Bombadil.index(SearchIndex, payload: %{"title" => "C++ Primer"}))
+      results = TestRepo.all(Bombadil.fuzzy_search(SearchIndex, "C plus plus"))
+      assert Enum.any?(results, fn r -> r.payload["title"] == "C++ Primer" end)
+    end
+
+    test "very short query should not match everything" do
+      results = TestRepo.all(Bombadil.fuzzy_search(SearchIndex, "a"))
+      assert length(results) < 5 # Should not return all indexed data
+    end
+  end
+
   describe "search with a context" do
     test "and exact match" do
       assert {:ok, _} =
