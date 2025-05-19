@@ -56,7 +56,7 @@ defmodule BombadilTest do
       assert [] = TestRepo.all(Bombadil.search(SearchIndex, [%{"ask" => "ciao"}]))
     end
 
-    test "index payload with composite words and map" do
+    test "index payload with composite words and map (substring search)" do
       assert {:ok, _} =
                TestRepo.insert_or_update(
                  Bombadil.index(SearchIndex,
@@ -64,8 +64,9 @@ defmodule BombadilTest do
                  )
                )
 
+      # Use substring search mode to match substrings with special characters
       assert [%_{payload: %{"ask" => "?ciao._nested_and_other_things"}}] =
-               TestRepo.all(Bombadil.search(SearchIndex, [%{"ask" => "_nested"}]))
+               TestRepo.all(Bombadil.search(SearchIndex, [%{"ask" => "_nested"}], mode: :substring))
     end
   end
 
@@ -95,7 +96,7 @@ defmodule BombadilTest do
                TestRepo.all(Bombadil.search(SearchIndex, "hello world"))
     end
 
-    test "index payload with composite words" do
+    test "index payload with composite words (substring search)" do
       assert {:ok, _} =
                TestRepo.insert_or_update(
                  Bombadil.index(SearchIndex,
@@ -103,8 +104,9 @@ defmodule BombadilTest do
                  )
                )
 
+      # Use substring search mode to match substrings with special characters
       assert [%_{payload: %{"ask" => "?ciao._nested_and_other_things"}}] =
-               TestRepo.all(Bombadil.search(SearchIndex, "_nested"))
+               TestRepo.all(Bombadil.search(SearchIndex, "_nested", mode: :substring))
     end
   end
 

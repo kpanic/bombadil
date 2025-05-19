@@ -38,9 +38,11 @@ iex> YourRepo.insert_or_update(Bombadil.index(SearchIndex, payload: %{"book" => 
 # Raw SQL: INSERT INTO "search_index" ("payload") VALUES ('{"book": "Lord of the Rings"}')
 {:ok, struct}
 
-# Full string provided
+
+
+# Full string provided (full-text search, default)
 iex> YourRepo.all(Bombadil.search(SearchIndex, "Lord of the Rings"))
-# Raw SQL: SELECT s0."id", s0."test", s0."item_id", s0."payload" FROM "search_index" AS s0 WHERE ((payload::text) ~~* $1) ["%Lord of the Rings%"]
+# Raw SQL: SELECT s0."id", s0."test", s0."item_id", s0."payload" FROM "search_index" AS s0 WHERE (to_tsvector('english', payload::text) @@ websearch_to_tsquery('english', $1)) ["Lord of the Rings"]
 [
   %Bombadil.Ecto.Schema.SearchIndex{
     __meta__: #Ecto.Schema.Metadata<:loaded, "search_index">,
@@ -49,10 +51,22 @@ iex> YourRepo.all(Bombadil.search(SearchIndex, "Lord of the Rings"))
   }
 ]
 
-# One word provided (treated as case-insensitive)
+# Substring search (legacy, for partial/substring matches)
+iex> YourRepo.all(Bombadil.search(SearchIndex, "_nested", mode: :substring))
+# Raw SQL: SELECT s0."id", s0."test", s0."item_id", s0."payload" FROM "search_index" AS s0 WHERE ((payload::text) ~~* $1) ["%_nested%"]
+[
+  %Bombadil.Ecto.Schema.SearchIndex{
+    __meta__: #Ecto.Schema.Metadata<:loaded, "search_index">,
+    payload: %{"ask" => "?ciao._nested_and_other_things"},
+    id: 2
+  }
+]
 
+
+
+# One word provided (full-text search)
 iex> YourRepo.all(Bombadil.search(SearchIndex, "lord"))
-# Raw SQL: SELECT s0."id", s0."test", s0."item_id", s0."payload" FROM "search_index" AS s0 WHERE ((payload::text) ~~* $1) ["%lord%"]
+# Raw SQL: SELECT s0."id", s0."test", s0."item_id", s0."payload" FROM "search_index" AS s0 WHERE (to_tsvector('english', payload::text) @@ websearch_to_tsquery('english', $1)) ["lord"]
 [
   %Bombadil.Ecto.Schema.SearchIndex{
     __meta__: #Ecto.Schema.Metadata<:loaded, "search_index">,
@@ -61,10 +75,12 @@ iex> YourRepo.all(Bombadil.search(SearchIndex, "lord"))
   }
 ]
 
-# No results
 
+
+# No results (full-text search)
 iex> YourRepo.all(Bombadil.search(SearchIndex, "lordz"))
-# Raw SQL: SELECT s0."id", s0."test", s0."item_id", s0."payload" FROM "search_index" AS s0 WHERE ((payload::text) ~~* $1) ["%lordz%"][]
+# Raw SQL: SELECT s0."id", s0."test", s0."item_id", s0."payload" FROM "search_index" AS s0 WHERE (to_tsvector('english', payload::text) @@ websearch_to_tsquery('english', $1)) ["lordz"]
+[]
 ```
 
 ## Fuzzy match

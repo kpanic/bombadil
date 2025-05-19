@@ -29,12 +29,12 @@ defmodule Bombadil.Search do
 
   defp construct_exact_match_query(schema, search_query, opts) do
     context = Keyword.get(opts, :context, %{})
-
+    mode = Keyword.get(opts, :mode, :fulltext)
     order_by = Bombadil.Criteria.order_by(search_query)
 
     from(i in schema,
       where: ^Enum.into(context, []),
-      where: ^Bombadil.Criteria.prepare(search_query),
+      where: ^Bombadil.Criteria.prepare(search_query, mode),
       order_by: ^order_by
     )
   end
